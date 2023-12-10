@@ -72,7 +72,7 @@ Richmond have digitized maps and information from the HOLC as part of
 the [Mapping
 Inequality](https://dsl.richmond.edu/panorama/redlining/#loc=5/39.1/-94.58)
 project. It was directly accessed from the site and downloaded as a
-ShapeFile.
+GeoJSn
 
 Information on the data can be found
 [here](https://dsl.richmond.edu/panorama/redlining/#loc=5/39.1/-94.58&text=downloads)[^3].
@@ -109,11 +109,13 @@ to:
 
 -   rates of low income
 
--   percentile for Particular Matter 2.5
+-   percentile for Particular Matter (PM) 2.5
 
 -   percentile for low life expectancy
 
 -   percentile for air toxic cancer risk
+
+## Import Libraries
 
 ```{r, message=FALSE, warning=FALSE}
 library(tmap)
@@ -127,24 +129,32 @@ library(formattable)
 library(janitor)
 ```
 
-```{r, warning = FALSE, error=FALSE, message=FALSE}
+## Import data
+
+Import our EJScreen, Redlining GeoJSn data, and bird observations.
+
+```{r, message=FALSE}
 # Import EJ Screen data
 ej_screen <-
   st_read("data/EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb") %>% 
-  clean_names()
+  clean_names() # clean column names
 
 # Import redlining information for Los Angeles
 
 LA_redlining <- st_read("https://dsl.richmond.edu/panorama/redlining/static/downloads/geojson/CALosAngeles1939.geojson") %>% 
   st_make_valid() # validates geometry
+
+# Import bird observation data
+bird_observation <- st_read("data/gbif-birds-LA/gbif-birds-LA.shp")
+
 ```
 
-### Prepare data
+## Prepare data
 
 Let's prepare the data for Los Angeles county and Redlining for
 analysis.
 
-```{r, message=FALSE, warning=FALSE, error=FALSE}
+```{r, message=FALSE, results='hide'}
 # Filter to Los Angeles and remove NA values
 los_angeles <- ej_screen %>% filter(cnty_name == "Los Angeles County",
                                     !is.na(p_pwdis))
@@ -158,17 +168,20 @@ if (st_crs(los_angeles) != st_crs(LA_redlining)){
 st_crs(los_angeles) == st_crs(LA_redlining)
 ```
 
+### EJScreen parameters analysis
+The first parameter we are interested in is the census block groups that 
+are above the 95th percentile of national values for wastewater discharge. 
 
 ```{r, include=FALSE}
-# Filter census block groups above the 95th percentile of national values for 
-# wastewater discharge
+# Filter census block groups
 los_angeles_water <- los_angeles %>% 
   filter(p_pwdis > 95) %>% 
   st_centroid() # turn into a point polygon
 ```
 
-Wastewater discharge
-```{r, echo = FALSE}
+Once filtered we can map our results 
+
+```{r}
 # Los Angles centroid base
 tm_shape(los_angeles) +
   tm_polygons(fill = 'p_pwdis',
@@ -197,8 +210,8 @@ tm_shape(los_angeles) +
                 fill = 'red')
 ```
 
-How many census block groups have less than 5% of the population
-considered low income?
+The next environmental justice parameters I want to analyze are what percentage 
+of census block groups have less than 5% of the population considered low income?
 
 ```{r}
 # filter census blocks
@@ -211,18 +224,22 @@ low_income_5 <- los_angeles %>%
 paste(round(nrow(low_income_5)/nrow(los_angeles) * 100,3), "% of the population is low income")
 ```
 
-80th percentile for PM 2.5
+As well as, what percentage of census block are above the 80th percentile for 
+PM 2.5 and Superfund proximity.
 
 ```{r}
-# above the 80th percentile for Particulate Matter 2.5 and above the 80th percentile for Superfund proximity
+# filter PM 2.5 and Superfund proximity
 pm2_5 <- los_angeles %>% select(p_pm25, p_pnpl) %>%
   filter(p_pm25 > 80 & p_pnpl > 80) 
 
-# Matter 2.5 and above the 80th percentile for Superfund proximity
-paste(round(nrow(pm2_5)/nrow(los_angeles)*100,3), "% of the census block are above the 80th percentile for Particular Matter 2.5")
+# Percent of census blocks
+paste(round(nrow(pm2_5)/nrow(los_angeles)*100,3), "% of the census block are 
+above the 80th percentile for PM 2.5 and Superfund proximity")
 ```
+### Historical redlining paramter analysis
 
-Make a map of historical redlining boundaries, colored by HOLC grade.
+Next let's make a map of the historical redlining boundaries, colored by HOLC grade 
+for LA county.
 
 ```{r}
 tm_shape(LA_redlining) +
@@ -234,3 +251,88 @@ tm_shape(LA_redlining) +
   tm_scale_bar() + 
   tm_layout(main.title = "LA redlining boundaries")
 ```
+First we need to identify the number of sensus block groups that fall within areas
+with HOLC grades.
+
+```{r eval=TRUE}
+# Filter LA EJScreen for redlining data
+
+redlining_blocks <- los_angeles %>%
+  st_filter(y = LA_redlining, .predicate = st_intersects)
+
+# Census blocks
+paste(nrow(redlining_blocks),"census block groups")
+```
+
+Combining the Redlining and EJScreen data I am interested in analyzing how current 
+conditions are within historical redlining categories. I will analyze the mean
+for:
+-% low income
+- percentile for particulate Matter 2.
+- percentile for low life expectancy 
+- percentile for air toxics cancer risk
+
+```{r }
+
+# Combine LA EJScreen and Redlining data for LA county
+
+LA <- st_intersection(los_angeles, LA_redlining)
+
+# Find the mean of % low income within historical redlining categories
+mean_table <- LA %>% 
+  group_by(holc_grade) %>% 
+  summarise(mean_Low_Income = mean(lowincpct, na.rm = TRUE),
+            mean_particular_matter = mean(p_pm25, na.rm = TRUE),
+            mean_low_life_expectancy = mean(p_lifeexppct, na.rm = TRUE),
+            mean_cancer_risk = mean(p_cancer, na.rm = TRUE)
+            ) %>% st_drop_geometry() # drop geometry
+  
+# Table with values
+formattable(mean_table)
+```
+For all of the variables, they have a higher mean in Holc Grades C and
+D. Areas that were deemed "Definitely Declining"(C) and "Hazardous"(D)
+have higher mean values in % low income, particular Matter 2.5,
+percentile for low life expectancy,and percentile for air toxic cancer
+risk. Areas C and D have worst quality of life. 
+
+### Bird observatory
+
+The final analysis this notebook will cover is analyze if areas in historical
+redlining report fewer observations of birds?
+
+```{r}
+# Transform bird observation CRS to redlining
+bird_observation <- st_transform(bird_observation,crs = st_crs(LA_redlining))
+
+# Intersect red lining map and bird observation
+la_birds <- st_intersection(x = LA_redlining, y = bird_observation)
+
+# Percent observations of birds in HOLC grads
+birds <- la_birds %>% 
+  filter(year == 2022) %>% 
+  group_by(holc_grade) %>% 
+  summarise(count = n()) %>% 
+  mutate("sum" = sum(count),
+         "percent" = count / sum * 100)
+
+## Plot birds observations
+ggplot(birds) + 
+  geom_col(aes(x = holc_grade,
+               y= percent, 
+               fill = holc_grade)) +
+  labs(x = "HOLC grade",
+       y = "Percent of Observations (%)",
+       title = "2022 Bird Observations within neighborhoods with HOLC grades",
+       fill = "HOLC grade")
+
+```
+HOLC grades C and D had the highest percent of bird observations. This is 
+surprising as these areas are deemed "worst" and have higher means in particular
+matter 2.5. I would have expected there to be more birds reported in grade A or
+B instead. Some potential implications could be that there are just more people 
+in grade C and D reporting the birds. Or there could just be more people in 
+general living in Grade C and D then A and B. 
+
+
+

@@ -41,13 +41,11 @@ conservation decisions are made based on these data.
     bird biodiversity sampling in the United States. Nature Human
     Behaviour, 1-9.
 
-This notebook will analyze L.A County reported bird diversity with
-respect to redlining practices of the past. A recent study has found
-that LA neighborhoods that are in a redlining district view less
-diversity in birds[^3]. There are less canopy covers in lower income
-neighborhoods and the birds found are those that are resilient to living
-in urban settings. Reducing the biodiversity of birds that can survive
-in these neighborhoods.
+A recent study has found that LA neighborhoods that are in a redlining
+district view less diversity in birds[^3]. There are fewer canopy covers
+in lower-income neighborhoods and the birds found are those that are
+resilient to living in urban settings. Reducing the biodiversity of
+birds that can survive in these neighborhoods.
 
 [^3]: Eric M Wood, Sevan Esaian, Christian Benitez, Philip J Ethington,
     Travis Longcore, Lars Y Pomara, Historical racial redlining and
@@ -56,23 +54,105 @@ in these neighborhoods.
     Applications, 2023;, duad044,
     <https://doi.org/10.1093/ornithapp/duad044>
 
+This notebook will conduct an analysis of environmental justice in L.A.
+County's census block. As well as the relationship of historical
+redlining districts to environmental injustices: pollution, income
+disparities, and health effects. This will expand to an analysis of
+historical redline communities(D) that are seeing lower reports of birds
+than their counterparts (A).
+
 # Data Used
 
 1.  **EJScreen:** Environmental Protection Agency's Environmental
-    Justice Screening and Mapping Tool.
-    According to the [US EPA
+    Justice Screening and Mapping Tool. According to the [US EPA
     website](https://www.epa.gov/ejscreen/purposes-and-uses-ejscreen):
 
-    > This screening tool and data may be of interest to community
-    > residents or other stakeholders as they search for environmental
-    > or demographic information. It can also support a wide range of
-    > research and policy goals. The public has used EJScreen in many
-    > different locations and in many different ways.
+    > EJScreen is an EPA's environmental justice mapping and screening
+    > tool that provides EPA with a nationally consistent dataset and
+    > approach for combining environmental and demographic socioeconomic
+    > indicators. EJScreen users choose a geographic area; the tool then
+    > provides demographic socioeconomic and environmental information
+    > for that area. All of the EJScreen indicators are publicly
+    > available data. EJScreen simply provides a way to display this
+    > information and includes a method for combining environmental and
+    > demographic indicators into EJ indexes.
+
+EJScreen provides data on environmental and demographic information for
+the US at the Census [tract](https://en.wikipedia.org/wiki/Census_tract)
+and [block group](https://en.wikipedia.org/wiki/Census_block_group)
+levels. This notebook will analyse:
+
+-   Census block groups that
+
+    -   are above the 95th percentile of national values for wastewater
+        discharge
+
+    -   have less than 5% of the population are considered low-income
+
+    -   above the 80th percentile for Particular Matters 2.5
+
+    -   above the 80th percentile for Superfund proximity
 
 2.  **Mapping Inequality**
 
-3.  **The [Global Biodiversity Information Facility](gbif.org)**
+A team of researchers, led by the [Digital Scholarship
+Lab](https://dsl.richmond.edu/) at the University of Richmond have
+digitized maps and information from the HOLC as part of the [Mapping
+Inequality](https://dsl.richmond.edu/panorama/redlining/#loc=5/39.1/-94.58)
+project.
+
+Information on the data can be found
+[here](https://dsl.richmond.edu/panorama/redlining/#loc=5/39.1/-94.58&text=downloads)[^4].
+
+[^4]: Robert K. Nelson, LaDale Winling, Richard Marciano, Nathan
+    Connolly, et al., "Mapping Inequality," American Panorama, ed.
+    Robert K. Nelson and Edward L. Ayers, accessed October 17, 2023,
+    <https://dsl.richmond.edu/panorama/redlining/>
+
+This notebook will cover:
+
+Historical redlining areas
+
+-   low income
+
+-   percentile for Particular Matter 2.5
+
+-   percentile for low life expectancy
+
+-   percentile for air toxic cancer risk
+
+3.  **Global Biodiversity Information Facility**
+
+The [Global Biodiversity Information Facility](gbif.org) is the largest
+aggregator of biodiversity observations in the world. Observations
+typically include a location and date that a species was observed.
 
 # Analysis
 
-# Import Libraries
+### Import Libraries
+Load relevant packages
+
+```{r, error=FALSE, warning=FALSE}
+library(tmap)
+library(tidyverse)
+library(sf)
+library(dplyr)
+library(ggplot2)
+library(gt)
+library(magrittr)
+library(formattable)
+library(janitor)
+```
+
+### EJScreen data analysis
+Let's first read in the data and filter to Los Angeles County
+```{r}
+ej_screen <-
+  st_read("data/EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb") %>% 
+  clean_names()
+
+# Filter to Los Angeles
+los_angeles <- ej_screen %>% filter(cnty_name == "Los Angeles County")
+
+```
+

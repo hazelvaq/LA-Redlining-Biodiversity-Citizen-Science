@@ -12,102 +12,87 @@ editor_options:
 knitr::opts_chunk$set(include = TRUE, message = FALSE, warning = FALSE)
 ```
 
-# Background information
 
-Current environmental injustice reflects legacies of the past. In the
-1930's the Home Owners' Loan Corporation (HOLC), as part of the New
-Deal, rated neighborhoods based on their perceived safety for real
-estate investment. Their ranking system, (A (green), B (blue), C
+# Background Information
+
+Redlining is a historical practice with racial undertones incorporated
+in 1930 by the Home Owners' Loan Corporation (HOLC), as part of the New
+Deal. Neighborhoods were rated based on their perceived safety for real
+estate investment. Their ranking system, A (green), B (blue), C
 (yellow), D (red)) was then used to block access to loans for home
 ownership. This practice targeted and discriminated against minority
-residents also known as redlining. This unjust practice is still felt to
-this day as it halted economic development and impacted the health of
-the residents[^1].
-
-[^1]: Gee, G. C. (2008). A multilevel analysis of the relationship
-    between institutional and individual racial discrimination and
-    health status. American journal of public health, 98(Supplement_1),
-    S48-S56.
+residents. This unjust practice halted economic development and created
+environmental injustice[^1].
 
 A recent study found that redlining is also affecting the observations
-of biodiversity[^2]. Ellis-Soto and co-authors found that redlined
+of biodiversity[^1]. Ellis-Soto and co-authors found that redlined
 neighborhoods remain the most under sampled areas across 195 US cities.
 Observation like these rely on community or citizen scientist to
 contribute and identify species. The gap in data is concerning because
 conservation decisions are made based on these data.
 
-[^2]: Ellis-Soto, D., Chapman, M., & Locke, D. H. (2023). Historical
+[^1]: Ellis-Soto, D., Chapman, M., & Locke, D. H. (2023). Historical
     redlining is associated with increasing geographical disparities in
     bird biodiversity sampling in the United States. Nature Human
     Behaviour, 1-9.
 
-A recent study has found that LA neighborhoods that are in a redlining
-district view less diversity in birds[^3]. There are fewer canopy covers
-in lower-income neighborhoods and the birds found are those that are
-resilient to living in urban settings. Reducing the biodiversity of
-birds that can survive in these neighborhoods.
+Specifically in LA county, neighborhoods in redlining district view less
+biodiversity in birds[^2]. These areas have fewer canopy covers which
+leads to only certain birds more resilient to urban life to be present.
 
-[^3]: Eric M Wood, Sevan Esaian, Christian Benitez, Philip J Ethington,
+[^2]: Eric M Wood, Sevan Esaian, Christian Benitez, Philip J Ethington,
     Travis Longcore, Lars Y Pomara, Historical racial redlining and
     contemporary patterns of income inequality negatively affect birds,
     their habitat, and people in Los Angeles, California, Ornithological
     Applications, 2023;, duad044,
     <https://doi.org/10.1093/ornithapp/duad044>
 
-This notebook will conduct an analysis of environmental justice in L.A.
-County's census block. As well as the relationship of historical
-redlining districts to environmental injustices: pollution, income
-disparities, and health effects. This will expand to an analysis of
-historical redline communities(D) that are seeing lower reports of birds
-than their counterparts (A).
+# Data
 
-# Data Used
+[EJScreen]{.underline}
 
-1.  **EJScreen:** Environmental Protection Agency's Environmental
-    Justice Screening and Mapping Tool. According to the [US EPA
-    website](https://www.epa.gov/ejscreen/purposes-and-uses-ejscreen):
-
-    > EJScreen is an EPA's environmental justice mapping and screening
-    > tool that provides EPA with a nationally consistent dataset and
-    > approach for combining environmental and demographic socioeconomic
-    > indicators. EJScreen users choose a geographic area; the tool then
-    > provides demographic socioeconomic and environmental information
-    > for that area. All of the EJScreen indicators are publicly
-    > available data. EJScreen simply provides a way to display this
-    > information and includes a method for combining environmental and
-    > demographic indicators into EJ indexes.
+The Environmental Protection Agency's Environmental Justice Screening and
+Mapping Tool spatial data was used to access data on income, health, and race for 
+LA county. The EJScreen uses data that is publicly available to be used to 
+analyze environmental justice across the country. There are potential limitations
+to this dataset: uncertainty in estimates for smaller areas, does not cover all 
+relevant issues, and environmental indicators are only screening-level proxies
+for actual health impacts.
 
 EJScreen provides data on environmental and demographic information for
 the US at the Census [tract](https://en.wikipedia.org/wiki/Census_tract)
 and [block group](https://en.wikipedia.org/wiki/Census_block_group)
-levels. This notebook will analyse:
+levels.
 
-2.  **Mapping Inequality**
+[Mapping Inequality]{.underline}
 
-A team of researchers, led by the [Digital Scholarship
-Lab](https://dsl.richmond.edu/) at the University of Richmond have
-digitized maps and information from the HOLC as part of the [Mapping
+The redlining maps were obtain from the [Digital Scholarship
+Lab](https://dsl.richmond.edu/). Researchers at the University of
+Richmond have digitized maps and information from the HOLC as part of
+the [Mapping
 Inequality](https://dsl.richmond.edu/panorama/redlining/#loc=5/39.1/-94.58)
-project.
+project. It was directly accessed from the site and downloaded as a
+ShapeFile.
 
 Information on the data can be found
-[here](https://dsl.richmond.edu/panorama/redlining/#loc=5/39.1/-94.58&text=downloads)[^4].
+[here](https://dsl.richmond.edu/panorama/redlining/#loc=5/39.1/-94.58&text=downloads)[^3].
 
-[^4]: Robert K. Nelson, LaDale Winling, Richard Marciano, Nathan
+[^3]: Robert K. Nelson, LaDale Winling, Richard Marciano, Nathan
     Connolly, et al., "Mapping Inequality," American Panorama, ed.
     Robert K. Nelson and Edward L. Ayers, accessed October 17, 2023,
     <https://dsl.richmond.edu/panorama/redlining/>
 
+[Global Biodiversity Information Facility]{.underline}
 
-3.  **Global Biodiversity Information Facility**
+The community scientist bird observations data was downloaded as a
+ShapeFile from the [Global Biodiversity Information Facility](gbif.org).
+Observations include the location, date, and species observed..
 
-The [Global Biodiversity Information Facility](gbif.org) is the largest
-aggregator of biodiversity observations in the world. Observations
-typically include a location and date that a species was observed.
+# Analysis:
 
-# Analysis
-
-My initial analysis is to get a scope of LA county economic and racial distribution. Using the EJScreen I am interested in analyzing Census block groups that:
+My initial analysis is to get a scope of LA county economic and racial
+distribution. Using the EJScreen I am interested in analyzing Census
+block groups that:
 
     -   are above the 95th percentile of national values for wastewater
         discharge
@@ -118,12 +103,11 @@ My initial analysis is to get a scope of LA county economic and racial distribut
 
     -   above the 80th percentile for Superfund proximity
 
+Building on to these I will also analyze the economic and health
+disparity in historical redlined areas. How does redlining areas relate
+to:
 
-This notebook will cover:
-
-Historical redlining areas
-
--   low income
+-   rates of low income
 
 -   percentile for Particular Matter 2.5
 
@@ -131,12 +115,7 @@ Historical redlining areas
 
 -   percentile for air toxic cancer risk
 
-
-
-### Import Libraries
-Load relevant packages
-
-```{r, error=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE}
 library(tmap)
 library(tidyverse)
 library(sf)
@@ -148,10 +127,7 @@ library(formattable)
 library(janitor)
 ```
 
-### Import data
-Let's import all of our necessary data sets for our analysis. 
-
-```{r, message=FALSE, warning=FALSE}
+```{r, warning = FALSE, error=FALSE, message=FALSE}
 # Import EJ Screen data
 ej_screen <-
   st_read("data/EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb") %>% 
@@ -164,8 +140,11 @@ LA_redlining <- st_read("https://dsl.richmond.edu/panorama/redlining/static/down
 ```
 
 ### Prepare data
-Let's prepare the data for Los Angeles county and Redlining for analysis.
-```{r, results='hide'}
+
+Let's prepare the data for Los Angeles county and Redlining for
+analysis.
+
+```{r, message=FALSE, warning=FALSE, error=FALSE}
 # Filter to Los Angeles and remove NA values
 los_angeles <- ej_screen %>% filter(cnty_name == "Los Angeles County",
                                     !is.na(p_pwdis))
@@ -179,10 +158,8 @@ if (st_crs(los_angeles) != st_crs(LA_redlining)){
 st_crs(los_angeles) == st_crs(LA_redlining)
 ```
 
-Our initial analysis is to observe which census blocks in L.A. county 
-have above the 95th percentile of national values for discharge. 
 
-```{r}
+```{r, include=FALSE}
 # Filter census block groups above the 95th percentile of national values for 
 # wastewater discharge
 los_angeles_water <- los_angeles %>% 
@@ -190,9 +167,8 @@ los_angeles_water <- los_angeles %>%
   st_centroid() # turn into a point polygon
 ```
 
-Develop a map of the percentile of wastewater discharge.
-
-```{r}
+Wastewater discharge
+```{r, echo = FALSE}
 # Los Angles centroid base
 tm_shape(los_angeles) +
   tm_polygons(fill = 'p_pwdis',
@@ -220,7 +196,9 @@ tm_shape(los_angeles) +
   tm_add_legend(labels = 'Wastewater Discharge',
                 fill = 'red')
 ```
-How many census block groups have less than 5% of the population considered low income?
+
+How many census block groups have less than 5% of the population
+considered low income?
 
 ```{r}
 # filter census blocks
@@ -232,6 +210,7 @@ low_income_5 <- los_angeles %>%
 # Percent of the population is low income
 paste(round(nrow(low_income_5)/nrow(los_angeles) * 100,3), "% of the population is low income")
 ```
+
 80th percentile for PM 2.5
 
 ```{r}
@@ -255,4 +234,3 @@ tm_shape(LA_redlining) +
   tm_scale_bar() + 
   tm_layout(main.title = "LA redlining boundaries")
 ```
-

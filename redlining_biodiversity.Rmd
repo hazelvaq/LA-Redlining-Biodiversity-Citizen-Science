@@ -82,17 +82,6 @@ the US at the Census [tract](https://en.wikipedia.org/wiki/Census_tract)
 and [block group](https://en.wikipedia.org/wiki/Census_block_group)
 levels. This notebook will analyse:
 
--   Census block groups that
-
-    -   are above the 95th percentile of national values for wastewater
-        discharge
-
-    -   have less than 5% of the population are considered low-income
-
-    -   above the 80th percentile for Particular Matters 2.5
-
-    -   above the 80th percentile for Superfund proximity
-
 2.  **Mapping Inequality**
 
 A team of researchers, led by the [Digital Scholarship
@@ -109,6 +98,27 @@ Information on the data can be found
     Robert K. Nelson and Edward L. Ayers, accessed October 17, 2023,
     <https://dsl.richmond.edu/panorama/redlining/>
 
+
+3.  **Global Biodiversity Information Facility**
+
+The [Global Biodiversity Information Facility](gbif.org) is the largest
+aggregator of biodiversity observations in the world. Observations
+typically include a location and date that a species was observed.
+
+# Analysis
+
+My initial analysis is to get a scope of LA county economic and racial distribution. Using the EJScreen I am interested in analyzing Census block groups that:
+
+    -   are above the 95th percentile of national values for wastewater
+        discharge
+
+    -   have less than 5% of the population are considered low-income
+
+    -   above the 80th percentile for Particular Matters 2.5
+
+    -   above the 80th percentile for Superfund proximity
+
+
 This notebook will cover:
 
 Historical redlining areas
@@ -121,13 +131,7 @@ Historical redlining areas
 
 -   percentile for air toxic cancer risk
 
-3.  **Global Biodiversity Information Facility**
 
-The [Global Biodiversity Information Facility](gbif.org) is the largest
-aggregator of biodiversity observations in the world. Observations
-typically include a location and date that a species was observed.
-
-# Analysis
 
 ### Import Libraries
 Load relevant packages
@@ -144,15 +148,111 @@ library(formattable)
 library(janitor)
 ```
 
-### EJScreen data analysis
-Let's first read in the data and filter to Los Angeles County
-```{r}
+### Import data
+Let's import all of our necessary data sets for our analysis. 
+
+```{r, message=FALSE, warning=FALSE}
+# Import EJ Screen data
 ej_screen <-
   st_read("data/EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb") %>% 
   clean_names()
 
-# Filter to Los Angeles
-los_angeles <- ej_screen %>% filter(cnty_name == "Los Angeles County")
+# Import redlining information for Los Angeles
 
+LA_redlining <- st_read("https://dsl.richmond.edu/panorama/redlining/static/downloads/geojson/CALosAngeles1939.geojson") %>% 
+  st_make_valid() # validates geometry
+```
+
+### Prepare data
+Let's prepare the data for Los Angeles county and Redlining for analysis.
+```{r, results='hide'}
+# Filter to Los Angeles and remove NA values
+los_angeles <- ej_screen %>% filter(cnty_name == "Los Angeles County",
+                                    !is.na(p_pwdis))
+
+# Update CRS of Los Angeles and Redlining
+if (st_crs(los_angeles) != st_crs(LA_redlining)){
+  LA_redlining <- st_transform(LA_redlining, crs = st_crs(los_angeles))
+}
+
+# Check if CRS are equal
+st_crs(los_angeles) == st_crs(LA_redlining)
+```
+
+Our initial analysis is to observe which census blocks in L.A. county 
+have above the 95th percentile of national values for discharge. 
+
+```{r}
+# Filter census block groups above the 95th percentile of national values for 
+# wastewater discharge
+los_angeles_water <- los_angeles %>% 
+  filter(p_pwdis > 95) %>% 
+  st_centroid() # turn into a point polygon
+```
+
+Develop a map of the percentile of wastewater discharge.
+
+```{r}
+# Los Angles centroid base
+tm_shape(los_angeles) +
+  tm_polygons(fill = 'p_pwdis',
+              title = "Percentile of Wastewater Discharge") +
+  tm_shape(los_angeles_water) + #wastewater discharge centroid
+  tm_dots(
+    'p_pwdis',
+    alpha = 0.7,
+    title.size = "A",
+    col = 'red',
+    title = 'A'
+  ) +
+  tm_layout(
+    legend.outside = FALSE,
+    main.title = 'LA Wastewater discharge above 95th percentile',
+    main.title.size = 10,
+    legend.text.size = 0.7,
+    legend.title.size = 0.7
+  ) +
+  tm_compass(type = "8star",
+             size = 1.5,
+             position = c("left", "bottom")) +
+  tm_graticules() +
+  tm_scale_bar(position = c(0.7, 0)) +
+  tm_add_legend(labels = 'Wastewater Discharge',
+                fill = 'red')
+```
+How many census block groups have less than 5% of the population considered low income?
+
+```{r}
+# filter census blocks
+low_income_5 <- los_angeles %>%
+  select(lowincpct) %>%
+  filter(lowincpct < .05) 
+
+
+# Percent of the population is low income
+paste(round(nrow(low_income_5)/nrow(los_angeles) * 100,3), "% of the population is low income")
+```
+80th percentile for PM 2.5
+
+```{r}
+# above the 80th percentile for Particulate Matter 2.5 and above the 80th percentile for Superfund proximity
+pm2_5 <- los_angeles %>% select(p_pm25, p_pnpl) %>%
+  filter(p_pm25 > 80 & p_pnpl > 80) 
+
+# Matter 2.5 and above the 80th percentile for Superfund proximity
+paste(round(nrow(pm2_5)/nrow(los_angeles)*100,3), "% of the census block are above the 80th percentile for Particular Matter 2.5")
+```
+
+Make a map of historical redlining boundaries, colored by HOLC grade.
+
+```{r}
+tm_shape(LA_redlining) +
+  tm_polygons("holc_grade",
+              title = "HOLC grade") +
+  tm_compass(type = "8star",
+             size = 2) +
+  tm_graticules() +
+  tm_scale_bar() + 
+  tm_layout(main.title = "LA redlining boundaries")
 ```
 

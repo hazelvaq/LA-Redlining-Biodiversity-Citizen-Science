@@ -141,7 +141,7 @@ ej_screen <-
 
 # Import redlining information for Los Angeles
 
-LA_redlining <- st_read("https://dsl.richmond.edu/panorama/redlining/static/downloads/geojson/CALosAngeles1939.geojson") %>% 
+LA_redlining <- st_read("https://dsl.richmond.edu/panorama/redlining/static/citiesData/CALosAngeles1939/geojson.json") %>% 
   st_make_valid() # validates geometry
 
 # Import bird observation data

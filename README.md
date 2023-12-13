@@ -33,6 +33,7 @@ Spatial files were analyzed using `sf` package
 ```
 ## Data Citations
 Data was obtained from:
+
 [EPA EJScreen](https://ejscreen.epa.gov/mapper/)
 
 [Digital Scholarship Lab](https://dsl.richmond.edu/)

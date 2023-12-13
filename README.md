@@ -9,6 +9,7 @@ scientistist is concerning as conservation efforts are made based on biodiversit
 # Procedure
 
 # File Structure
+```bash
 ├── data
 │   ├── EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb
 │   └── gbif-birds-LA
@@ -20,5 +21,5 @@ scientistist is concerning as conservation efforts are made based on biodiversit
 ├── README.md
 ├── redlining_biodiversity.html
 └── redlining_biodiversity.Rmd
-
+```
 # Data Citations

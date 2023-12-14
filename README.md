@@ -1,4 +1,4 @@
-# Investigating Historical Redlinings Impacts on Citizen Scientist reported Observations
+# Investigating Historical Redlinings Impacts on Citizen Scientist reported Bird Observations
 ![image](https://github.com/hazelvaq/LA-Redlining-Biodiversity-Citizen-Science/assets/108312152/c8121288-e200-4d8b-abba-6ff813f1a1e7)
 
 
@@ -6,10 +6,9 @@
 
 ## About 
 
-This repo contains a notebook `redlining_biodiversity`, that analysis how historical redlining in LA county display modern day consequences 
-on health, economic development, and biodiversity. Hisorical redlining areas tend to be undersampled and the gap in observations from citizen 
-scientistist is concerning as conservation efforts are made based on biodiversity observations. This notebook explores if historical redlining
-"low" grade neighborhoods in LA are reporting less bird observations than their counterpart "higher" grade neighborhoods.
+This repo contains an Rmarkdown `redlining_biodiversity.Rmd`, that analysis how historical redlining in LA county display modern day consequences 
+on health, economic development, and biodiversity. This project explores if historical redlining has an affect on reported bird observations from citizen scientist. 
+Are "low" grade neighborhoods in LA are reporting less bird observations than their counterpart "higher" grade neighborhoods?
 
 Steps taken to analyze:
 Spatial files were analyzed using `sf` package

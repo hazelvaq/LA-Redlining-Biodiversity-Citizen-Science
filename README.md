@@ -1,6 +1,7 @@
 # Investigating Historical Redlinings Impacts on Citizen Scientist reported Observations
 ![image](https://github.com/hazelvaq/LA-Redlining-Biodiversity-Citizen-Science/assets/108312152/c8121288-e200-4d8b-abba-6ff813f1a1e7)
 
+
 [*LA County Historical Redlining*](https://pbssocal.org/shows/lost-la/segregation-in-the-city-of-angels-a-1939-map-of-housing-inequality-in-l-a)
 
 ## About 

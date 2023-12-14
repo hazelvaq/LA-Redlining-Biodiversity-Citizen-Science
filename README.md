@@ -1,8 +1,8 @@
-# LA-Redlining-Biodiversity-Citizen-Science
+# Investigating Historical Redlinings Impacts on Citizen Scientist reported Observations
+![image](https://github.com/hazelvaq/LA-Redlining-Biodiversity-Citizen-Science/assets/108312152/c8121288-e200-4d8b-abba-6ff813f1a1e7)
+
 
 ## About 
-Assignment for EDS223: Geospatial Analysis and Remote Sensing
-Masters of Environmental Data Science UC Sant Barbara
 
 This repo contains a notebook `redlining_biodiversity`, that analysis how historical redlining in LA county display modern day consequences 
 on health, economic development, and biodiversity. Hisorical redlining areas tend to be undersampled and the gap in observations from citizen 
@@ -16,6 +16,12 @@ Spatial files were analyzed using `sf` package
 3. Map LA county environmental justice parameters
 4. Spatially join historical raster map and EJScreen data
 5. Summarize bird observations for the different neighborhood grades in Redlining 
+
+## Data Citations
+Data was obtained from:
+[EPA EJScreen](https://ejscreen.epa.gov/mapper/)
+[Digital Scholarship Lab](https://dsl.richmond.edu/)
+[Global Biodiversity Information Facility](gbif.org)
 
 ## File Structure
 ```bash
@@ -31,11 +37,3 @@ Spatial files were analyzed using `sf` package
 ├── redlining_biodiversity.html
 └── redlining_biodiversity.Rmd
 ```
-## Data Citations
-Data was obtained from:
-
-[EPA EJScreen](https://ejscreen.epa.gov/mapper/)
-
-[Digital Scholarship Lab](https://dsl.richmond.edu/)
-
-[Global Biodiversity Information Facility](gbif.org)

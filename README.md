@@ -7,7 +7,7 @@
 ## About 
 
 This repo contains an Rmarkdown `redlining_biodiversity.Rmd`, that analysis how historical redlining in LA county display modern day consequences 
-on health, economic development, and biodiversity. This project explores if historical redlining has an affect on reported bird observations from citizen scientist. 
+on health, economic development, and biodiversity. This project explores if historical redlining has an affect on reported bird observations from citizen scientists. 
 Are "low" grade neighborhoods in LA are reporting less bird observations than their counterpart "higher" grade neighborhoods?
 
 Steps taken to analyze:

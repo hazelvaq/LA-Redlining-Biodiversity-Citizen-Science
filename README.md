@@ -1,4 +1,4 @@
-# Investigating Historical Redlinings Impacts on Citizen Scientist reported Bird Observations
+# Investigating Historical Redlinings Impacts on Citizen Scientist Reported Bird Observations
 ![image](https://github.com/hazelvaq/LA-Redlining-Biodiversity-Citizen-Science/assets/108312152/c8121288-e200-4d8b-abba-6ff813f1a1e7)
 
 
